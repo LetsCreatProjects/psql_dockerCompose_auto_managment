@@ -1,0 +1,30 @@
+version: '3.7'
+services:
+  postgres-main:
+    image: postgres:latest
+
+    networks:
+      vpcbr:
+        ipv4_address: "172.18.0.2"
+
+    container_name: main_postgres_sql_db
+    ports:
+      - 55432:5432/tcp
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: please_change_me
+    volumes:
+      - ./passengers.sql:/docker-entrypoint-initdb.d/passengers.sql
+      - ./init.sh:/init.sh
+      - ./db_importer_v2.sh:/db_importer_v2.sh
+
+    # command: bash -c "
+    #   sleep 30 && chmod +x /init.sh && ./init.sh "
+
+networks:
+  vpcbr:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: "172.18.0.0/16"
+         gateway: "172.18.0.1"
